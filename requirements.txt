@@ -8,6 +8,4 @@ langchain-huggingface
 langchain-groq
 pypdf
 sentence-transformers
-pydantic
-pydantic-settings
 flask-cors
