@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: pravesh-saathi-ai
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false # User will need to paste this in Render dashboard
+      - key: PYTHON_VERSION
+        value: 3.10.0
