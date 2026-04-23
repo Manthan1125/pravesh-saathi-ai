@@ -1,6 +1,7 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch
 flask
+gunicorn
 requests
 beautifulsoup4
 python-dotenv
