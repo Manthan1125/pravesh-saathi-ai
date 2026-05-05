@@ -1,8 +1,8 @@
 import requests
 import json
 
-TOKEN = "789d6fa2-ad8f-46f4-be33-3aaee1d65c3b"
-SERVICE_ID = "ba8be940-cd14-4137-ab8a-b9d21019cdd6"
+TOKEN = "YOUR_TOKEN_HERE"
+SERVICE_ID = "YOUR_SERVICE_ID_HERE"
 headers = {"Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json"}
 API = "https://backboard.railway.app/graphql/v2"
 

@@ -915,12 +915,30 @@
       chat.scrollTop = chat.scrollHeight;
 
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 140000);
+
         const res = await fetch('/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: userText, session_id: SESSION_ID })
+          body: JSON.stringify({ message: userText, session_id: SESSION_ID }),
+          signal: controller.signal
         });
-        const data = await res.json();
+        clearTimeout(timeout);
+
+        let data = null;
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          const raw = await res.text();
+          data = { error: raw || `HTTP ${res.status}` };
+        }
+
+        if (!res.ok) {
+          throw new Error(data.error || `Request failed with status ${res.status}`);
+        }
+
         document.getElementById('thinking')?.remove();
 
         const reply = data.reply || (data.error ? `Server Error: ${data.error}` : 'Call connection failed.');
@@ -943,7 +961,10 @@
         }
       } catch (e) {
         document.getElementById('thinking')?.remove();
-        addMsg('agent', 'System offline. Please check if python app.py is running.');
+        const errMsg = e && e.name === 'AbortError'
+          ? 'Server took too long to respond. Please try again in a few seconds.'
+          : `Request failed: ${e.message || 'Unable to connect to server.'}`;
+        addMsg('agent', errMsg);
         setIdle();
         if (isInCall && recognition) { try { recognition.start(); } catch (err) { } }
       }

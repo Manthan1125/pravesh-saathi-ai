@@ -4,10 +4,13 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --timeout 120 --workers 1
+    startCommand: gunicorn app:app --timeout 300 --workers 1
+    autoDeploy: true
     envVars:
       - key: GROQ_API_KEY
         sync: false
       - key: PYTHON_VERSION
         value: "3.10.14"
+      - key: WEBSITE_REFRESH_MINUTES
+        value: "180"
     healthCheckPath: /

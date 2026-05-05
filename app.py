@@ -2,6 +2,8 @@ import os
 import re
 import requests
 import urllib.request
+import threading
+import time
 from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
@@ -52,6 +54,8 @@ UIET_PAGES = {
 }
 
 web_cache = {}
+web_context_lock = threading.Lock()
+WEB_REFRESH_MINUTES = int(os.getenv("WEBSITE_REFRESH_MINUTES", "180"))
 
 def scrape_page(url):
     if url in web_cache:
@@ -70,13 +74,31 @@ def scrape_page(url):
     return ""
 
 print("Loading UIET website data...")
-WEB_CONTEXT = ""
-for name, url in UIET_PAGES.items():
-    text = scrape_page(url)
-    if text:
-        WEB_CONTEXT += f"\n=== {name.upper()} ===\n{text}\n"
-WEB_CONTEXT = WEB_CONTEXT[:8000]
+def build_web_context():
+    context = ""
+    for name, url in UIET_PAGES.items():
+        text = scrape_page(url)
+        if text:
+            context += f"\n=== {name.upper()} ===\n{text}\n"
+    return context[:8000]
+
+WEB_CONTEXT = build_web_context()
 print("Website loaded!")
+
+def refresh_web_context_forever():
+    global WEB_CONTEXT
+    while True:
+        try:
+            fresh_context = build_web_context()
+            if fresh_context:
+                with web_context_lock:
+                    WEB_CONTEXT = fresh_context
+                print("Website context refreshed.")
+        except Exception as e:
+            print("Website refresh failed:", e)
+        time.sleep(max(60, WEB_REFRESH_MINUTES * 60))
+
+threading.Thread(target=refresh_web_context_forever, daemon=True).start()
 
 session_memory = {}
 
@@ -217,10 +239,13 @@ def ask_rag(query, session_id="default"):
     docs = retriever.invoke(query)
     local_context = "\n\n".join([doc.page_content for doc in docs])
 
+    with web_context_lock:
+        web_context = WEB_CONTEXT
+
     prompt = PROMPT_TEMPLATE.format(
         course_list=UIET_COURSES,
         local_context=local_context,
-        web_context=WEB_CONTEXT,
+        web_context=web_context,
         chat_history=format_history(history),
         question=query
     )
