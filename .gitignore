@@ -4,3 +4,13 @@ __pycache__/
 .env
 .idea/
 .vscode/
+
+# Large model files - DO NOT push to GitHub
+*.onnx
+*.bin
+voices.json
+test_voices.bin
+voice-agent/
+
+# Keep vector_db (needed for RAG on Render)
+# vector_db/ is intentionally NOT ignored

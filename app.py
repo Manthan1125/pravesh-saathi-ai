@@ -1,9 +1,14 @@
 import os
 import re
 import requests
+import urllib.request
 from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
+
+import base64
+import asyncio
+import edge_tts
 
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -234,6 +239,23 @@ def ask_rag(query, session_id="default"):
 
     return answer
 
+def generate_edge_audio(text):
+    async def _generate():
+        # en-IN-NeerjaNeural is a highly realistic Indian English female voice
+        communicate = edge_tts.Communicate(text, "en-IN-NeerjaNeural", rate="+5%")
+        audio_data = b""
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                audio_data += chunk["data"]
+        return audio_data
+        
+    try:
+        audio_bytes = asyncio.run(_generate())
+        return base64.b64encode(audio_bytes).decode('utf-8')
+    except Exception as e:
+        print("Edge TTS Error:", e)
+        return ""
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -249,7 +271,11 @@ def chat():
 
     try:
         reply = ask_rag(user_message, session_id)
-        return jsonify({"reply": reply})
+        
+        # Generate ultra-fast real human audio using Edge TTS
+        audio_b64 = generate_edge_audio(reply)
+        
+        return jsonify({"reply": reply, "audio": audio_b64})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

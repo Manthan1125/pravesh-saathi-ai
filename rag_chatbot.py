@@ -60,7 +60,7 @@ def scrape_page(url):
         pass
     return ""
 
-def get_all_web_context():
+def get_all_web_context():  
     combined = ""
     for name, url in UIET_PAGES.items():
         text = scrape_page(url)

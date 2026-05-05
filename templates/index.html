@@ -923,11 +923,24 @@
         const data = await res.json();
         document.getElementById('thinking')?.remove();
 
-        // If backend sends an error (like Groq API limits), show it!
         const reply = data.reply || (data.error ? `Server Error: ${data.error}` : 'Call connection failed.');
-
         addMsg('agent', reply);
-        speak(reply);
+
+        if (data.audio) {
+          setSpeaking();
+          isSpeaking = true;
+          const audio = new Audio("data:audio/wav;base64," + data.audio);
+          audio.onended = () => {
+            isSpeaking = false;
+            setIdle();
+            if (isInCall && recognition) {
+              try { recognition.start(); } catch (e) { }
+            }
+          };
+          audio.play();
+        } else {
+          speak(reply); // Fallback to browser TTS if kokoro fails
+        }
       } catch (e) {
         document.getElementById('thinking')?.remove();
         addMsg('agent', 'System offline. Please check if python app.py is running.');
