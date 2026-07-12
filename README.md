@@ -1,5 +1,6 @@
 
-Real-tim
+Real-time Voice Conversation: 
+Features a full voice call mode with custom front-end voice activity detection (VAD), silence detection, and audio recording.
 
 
 
