@@ -1,4 +1,13 @@
-Real-time Voice Conversation: 
+
+Real-tim
+
+https://github.com/user-attachments/assets/d084d315-4f14-43e1-9018-28dbefcffb95
+
+
+
+https://github.com/user-attachments/assets/317bf5fb-c4bf-4ad2-bd2f-18c864efccf9
+
+e Voice Conversation: 
 Features a full voice call mode with custom front-end voice activity detection (VAD), silence detection, and audio recording.
 
 ** Ultra-Low Latency STT & TTS:**
@@ -23,18 +32,8 @@ Mermaid diagram
 Directory Structure
 text
 
-├── app.py                # Main Flask application & routes (RAG, STT, TTS, Zingaro)
-├── create_vector_db.py   # RAG pipeline: PDF/TXT loader, chunker, & Chroma creator
-├── scrape_uiet.py        # Web scraper for real-time UIET admission notices
-├── zingaro_call.py       # Handler to place outbound calls using Zingaro API
-├── requirements.txt      # Python dependencies
-├── .env                  # Configuration variables & API keys (Groq, Zingaro)
-├── templates/
-│   └── index.html        # Interactive Glassmorphic Frontend & Orb Animations
-├── static/               # Assets & styles
-├── pdfs/                 # Official admission brochures (PDF format)
-├── knowledge/            # Scraped text files and structured knowledge bases
-└── vector_db/            # Local Chroma vector database storage
+<img width="611" height="247" alt="image" src="https://github.com/user-attachments/assets/cb1eb4c3-5b7c-42ba-84d6-e503c7dc901d" />
+
 
 ** Quick Start
 1. Prerequisites**
